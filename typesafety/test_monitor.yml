@@ -1,0 +1,30 @@
+- case: invalid_protocol_monitor_data
+  main: |
+    from typing import (
+      Dict,
+      Optional,
+      Union,
+    )
+    from aiomon.monitor import Monitor
+    
+    KVMonitorDataValue = Union[str, int, float]
+    
+    class InvalidKVMonitorData:
+      def __init__(self) -> None:
+        self.__data: Dict[str, KVMonitorDataValue] = {}
+
+      async def get_value(self, key: str) -> Optional[KVMonitorDataValue]:
+        return self.__data.get(key)
+
+      async def set_value(self, key: str, value: KVMonitorDataValue) -> None:
+        self.__data[key] = value
+    
+    class KVStdErrMonitorOutput:
+        async def write(self, data: InvalidKVMonitorData) -> None:
+            ...
+
+    monitor = Monitor[str, KVMonitorDataValue](
+      name="test-monitor",
+      cls_data=InvalidKVMonitorData,    # E: Argument "cls_data" to "Monitor" has incompatible type "Type[InvalidKVMonitorData]"; expected "Type[MonitorData[Any, Any]]"  [arg-type]
+      cls_output=KVStdErrMonitorOutput,
+    )
