@@ -40,10 +40,11 @@ path = "src/aiomon/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-  "pytest-asyncio",
-  "pytest-mypy-plugins"
+  "coverage[toml]>=7,<8",
+  "coverage-conditional-plugin>=0.9.0,<1.0.0",
+  "pytest>=7.4.0,<8.0.0",
+  "pytest-asyncio>=0.21.0,<1.0.0",
+  "pytest-mypy-plugins>=2.0.0,<3.0.0",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests typesafety}"
@@ -183,6 +184,7 @@ python_files = [
 ]
 
 [tool.coverage.run]
+plugins = ["coverage_conditional_plugin"]
 source_pkgs = ["aiomon", "tests"]
 branch = true
 parallel = true
@@ -197,6 +199,7 @@ tests = ["tests", "*/aiomon/tests"]
 
 [tool.coverage.report]
 exclude_lines = [
+    "pragma: no cover",
     "def __repr__",
     "if self.debug:",
     "if settings.DEBUG",
@@ -210,3 +213,7 @@ exclude_lines = [
 ]
 show_missing = true
 fail_under = 100
+
+[tool.coverage.coverage_conditional_plugin.rules]
+py-gte-38 = "sys_version_info >= (3, 8)"
+py-lt-38 = "sys_version_info < (3, 8)"

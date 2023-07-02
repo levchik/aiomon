@@ -6,9 +6,9 @@ from typing import (
     TypeVar,
 )
 
-if sys.version_info >= (3, 8):
+if sys.version_info >= (3, 8):  # pragma: py-lt-38
     from typing import Protocol, runtime_checkable
-else:
+else:  # pragma: py-gte-38
     from typing_extensions import Protocol, runtime_checkable
 
 from aiomon._sync import RWMutex
