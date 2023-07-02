@@ -1,4 +1,3 @@
-# TODO: to support 3.7 we need to use typing-extensions
 from typing import (
     Generic,
     Optional,
