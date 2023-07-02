@@ -25,6 +25,9 @@
 
     monitor = Monitor[str, KVMonitorDataValue](
       name="test-monitor",
-      cls_data=InvalidKVMonitorData,    # E: Argument "cls_data" to "Monitor" has incompatible type "type[InvalidKVMonitorData]"; expected "type[MonitorData[Any, Any]]"  [arg-type]
+      cls_data=InvalidKVMonitorData,
       cls_output=KVStdErrMonitorOutput,
     )
+  regex: yes
+  out: |
+    main:26: error: Argument "cls_data" to "Monitor" has incompatible type "[t,T]ype\[InvalidKVMonitorData\]"; expected "[t,T]ype\[MonitorData\[Any, Any\]\]"  \[arg-type\]
