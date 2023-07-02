@@ -1,11 +1,15 @@
+import sys
 from typing import (
     Generic,
     Optional,
-    Protocol,
     Type,
     TypeVar,
-    runtime_checkable,
 )
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol, runtime_checkable
+else:
+    from typing_extensions import Protocol, runtime_checkable
 
 from aiomon._sync import RWMutex
 
