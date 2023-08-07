@@ -1,7 +1,7 @@
 - case: invalid_protocol_monitor_data
   main: |
     import sys
-    from typing import AnyStr
+    from typing import AnyStr, Optional
     
     from aiomon.base import MonitorOutputData, MonitorStorageData
     from aiomon.impl.monitor import Monitor
@@ -17,7 +17,7 @@
       def format_(
         self,
         metrics: MonitorOutputData,
-        fields_only: set[str] | None = None,
+        fields_only: Optional[set[str]] = None,
       ) -> str:
         sys.stderr.write(f"fields_only: {fields_only}\n")
         return str(metrics)

@@ -48,7 +48,7 @@ class Monitor:
         name: str,
         output: Optional[MonitorOutput],
         formatter: Optional[MonitorFormatter],
-        storage: MonitorStorage | ExportableMonitorStorage,
+        storage: Union[MonitorStorage, ExportableMonitorStorage],
     ) -> None:
         # Validate arguments
         if output and not formatter:
