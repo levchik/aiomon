@@ -12,6 +12,7 @@ jobs:
     permissions: write-all
     name: Build & Publish to PyPI
     runs-on: ubuntu-latest
+    environment: PyPI
 
     steps:
     - uses: actions/checkout@v3
