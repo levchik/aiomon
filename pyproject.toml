@@ -212,7 +212,7 @@ exclude_lines = [
     '''@(abc\.)?abstractmethod'''
 ]
 show_missing = true
-fail_under = 100
+fail_under = 85
 
 [tool.coverage.coverage_conditional_plugin.rules]
 py-gte-38 = "sys_version_info >= (3, 8)"

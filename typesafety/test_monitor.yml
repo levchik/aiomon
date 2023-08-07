@@ -1,33 +1,51 @@
 - case: invalid_protocol_monitor_data
   main: |
-    from typing import (
-      Dict,
-      Optional,
-      Union,
-    )
-    from aiomon.monitor import Monitor
+    import sys
+    from typing import AnyStr
     
-    KVMonitorDataValue = Union[str, int, float]
+    from aiomon.base import MonitorOutputData, MonitorStorageData
+    from aiomon.impl.monitor import Monitor
     
-    class InvalidKVMonitorData:
+    class InvalidKVMonitorStorage:
       def __init__(self) -> None:
-        self.__data: Dict[str, KVMonitorDataValue] = {}
-
-      async def get_value(self, key: str) -> Optional[KVMonitorDataValue]:
-        return self.__data.get(key)
-
-      async def set_value(self, key: str, value: KVMonitorDataValue) -> None:
-        self.__data[key] = value
+        self.__data: MonitorStorageData = {}
+  
+      async def update(self, name: int, value: str) -> None:
+        self.__data[str(name)] = value
+    
+    class StrFormatter:
+      def format_(
+        self,
+        metrics: MonitorOutputData,
+        fields_only: set[str] | None = None,
+      ) -> str:
+        sys.stderr.write(f"fields_only: {fields_only}\n")
+        return str(metrics)
     
     class KVStdErrMonitorOutput:
-        async def write(self, data: InvalidKVMonitorData) -> None:
-            ...
-
-    monitor = Monitor[str, KVMonitorDataValue](
+      async def write(self, formatted_metrics: AnyStr) -> None:
+          if isinstance(formatted_metrics, bytes):
+            sys.stderr.write(formatted_metrics.decode("utf-8"))
+          else:
+            sys.stderr.write(formatted_metrics)
+          sys.stderr.flush()
+    
+    Monitor(
       name="test-monitor",
-      cls_data=InvalidKVMonitorData,
-      cls_output=KVStdErrMonitorOutput,
+      output=KVStdErrMonitorOutput(),
+      formatter=StrFormatter(),
+      storage=InvalidKVMonitorStorage(),
     )
-  regex: yes
   out: |
-    main:26: error: Argument "cls_data" to "Monitor" has incompatible type "[t,T]ype\[InvalidKVMonitorData\]"; expected "[t,T]ype\[MonitorData\[Any, Any\]\]"  \[arg-type\]
+    main:35: error: Argument "storage" to "Monitor" has incompatible type "InvalidKVMonitorStorage"; expected "MonitorStorage[Any] | ExportableMonitorStorage"  [arg-type]
+    main:35: note: Following member(s) of "InvalidKVMonitorStorage" have conflicts:
+    main:35: note:     Expected:
+    main:35: note:         def update(self, name: str, value: Any) -> Coroutine[Any, Any, None]
+    main:35: note:     Got:
+    main:35: note:         def update(self, name: int, value: str) -> Coroutine[Any, Any, None]
+    main:35: note: "InvalidKVMonitorStorage" is missing following "ExportableMonitorStorage" protocol member:
+    main:35: note:     get_data
+    main:35: note:     Expected:
+    main:35: note:         def update(self, name: str, value: Any) -> Coroutine[Any, Any, None]
+    main:35: note:     Got:
+    main:35: note:         def update(self, name: int, value: str) -> Coroutine[Any, Any, None]
