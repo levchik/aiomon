@@ -1,4 +1,4 @@
-from aiomon.base import MetricValue, MonitorStorageData
+from aiomon.base import MetricValue_contra, MonitorStorageData
 from aiomon.impl.storages._sync import RWMutex
 
 
@@ -7,7 +7,7 @@ class MemoryMonitorStorage:
         self.__data: MonitorStorageData = {}
         self.__mutex = RWMutex(self.__data)
 
-    async def update(self, name: str, value: MetricValue) -> None:
+    async def update(self, name: str, value: MetricValue_contra) -> None:
         async with self.__mutex.writer_lock() as data:
             data[name] = value
 

@@ -16,10 +16,12 @@ if sys.version_info >= (3, 8):  # pragma: py-lt-38
 else:  # pragma: py-gte-38
     from typing_extensions import Protocol, runtime_checkable
 
-MetricValue = TypeVar("MetricValue", contravariant=True)
+MetricValue_contra = TypeVar("MetricValue_contra", contravariant=True)
 FormattedMetrics = TypeVar("FormattedMetrics")
 FormattedMetrics_co = TypeVar("FormattedMetrics_co", covariant=True)
-FormattedMetrics_con = TypeVar("FormattedMetrics_con", contravariant=True)
+FormattedMetrics_contra = TypeVar(
+    "FormattedMetrics_contra", contravariant=True
+)
 
 
 @runtime_checkable
@@ -37,13 +39,13 @@ class Metric(Protocol):
         ...
 
 
-class MonitorOutputItem(Generic[MetricValue], NamedTuple):
+class MonitorOutputItem(Generic[MetricValue_contra], NamedTuple):
     metric: Metric
-    value: MetricValue
+    value: MetricValue_contra
 
 
 MonitorOutputData = List[MonitorOutputItem]
-MonitorStorageData = Dict[str, MetricValue]
+MonitorStorageData = Dict[str, MetricValue_contra]
 
 
 @runtime_checkable
@@ -57,14 +59,14 @@ class MonitorFormatter(Protocol[FormattedMetrics_co]):
 
 
 @runtime_checkable
-class MonitorOutput(Protocol[FormattedMetrics_con]):
-    async def write(self, formatted_metrics: FormattedMetrics_con) -> None:
+class MonitorOutput(Protocol[FormattedMetrics_contra]):
+    async def write(self, formatted_metrics: FormattedMetrics_contra) -> None:
         ...
 
 
 @runtime_checkable
-class MonitorStorage(Protocol[MetricValue]):
-    async def update(self, name: str, value: MetricValue) -> None:
+class MonitorStorage(Protocol[MetricValue_contra]):
+    async def update(self, name: str, value: MetricValue_contra) -> None:
         ...
 
 

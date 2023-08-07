@@ -1,4 +1,5 @@
 import json
+import os
 
 from aiomon.impl.formatters.json_ import JSONMonitorFormatter
 from aiomon.impl.metrics import InfoMetric
@@ -10,7 +11,7 @@ from aiomon.impl.storages.memory import MemoryMonitorStorage
 async def test_kv_monitor_data_methods_work():
     monitor = Monitor(
         name="test-monitor",
-        output=FileMonitorOutput(path="test.json"),
+        output=FileMonitorOutput(path="tests/test.json"),
         formatter=JSONMonitorFormatter(),
         storage=MemoryMonitorStorage(),
     )
@@ -28,3 +29,4 @@ async def test_kv_monitor_data_methods_work():
     )
     assert await monitor.format_() == expected_format
     await monitor.output()
+    os.remove("tests/test.json")
