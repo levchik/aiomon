@@ -1,0 +1,74 @@
+- case: old_api_add_metric
+  main: |
+    from aiomon import Monitor, JSONMonitorFormatter, CounterMetric, MemoryMonitorStorage
+
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+    
+    monitor = Monitor(
+        name="test",
+        storage=storage,
+        formatter=JSONMonitorFormatter(),
+    )
+    
+    async def test() -> None:
+        await monitor.add_metric(CounterMetric("requests", storage=storage))
+        data = await monitor.format_()
+        reveal_type(data)
+  out: |
+    main:14: note: Revealed type is "builtins.list[builtins.dict[builtins.str, Any]]"
+
+- case: old_api_monitor_constructor
+  main: |
+    from aiomon import Monitor, JSONMonitorFormatter, FileMonitorOutput, MemoryMonitorStorage
+
+    monitor = Monitor(
+        name="test",
+        output=FileMonitorOutput("/tmp/metrics.json"),
+        formatter=JSONMonitorFormatter(),
+        storage=MemoryMonitorStorage(),
+    )
+    
+    async def test() -> None:
+        await monitor.output()
+  out: |
+    Success: no issues found in 1 source file
+
+- case: new_api_recommended_pattern
+  main: |
+    from aiomon import (
+        Monitor, MetricGroup,
+        CounterMetric, GaugeMetric,
+        JSONMonitorFormatter, PrometheusFormatter,
+        MemoryMonitorStorage,
+    )
+
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+
+    class AppMetrics(MetricGroup, storage=storage):
+        requests = CounterMetric("requests", storage=storage)
+        temp = GaugeMetric("temp", storage=storage)
+
+    prom_monitor = Monitor(
+        name="prometheus",
+        storage=storage,
+        formatter=PrometheusFormatter(),
+    )
+
+    json_monitor = Monitor(
+        name="json",
+        storage=storage,
+        formatter=JSONMonitorFormatter(),
+    )
+
+    async def test() -> None:
+        await AppMetrics.requests.inc()
+        await AppMetrics.temp.set(25.0)
+        
+        prom_data = await prom_monitor.format_()
+        json_data = await json_monitor.format_()
+        
+        reveal_type(prom_data)
+        reveal_type(json_data)
+  out: |
+    main:33: note: Revealed type is "builtins.str"
+    main:34: note: Revealed type is "builtins.list[builtins.dict[builtins.str, Any]]"

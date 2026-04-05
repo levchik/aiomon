@@ -1,0 +1,69 @@
+- case: monitor_type_inference_from_formatter
+  main: |
+    from aiomon import Monitor, PrometheusFormatter, JSONMonitorFormatter, MemoryMonitorStorage
+
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+
+    prom_monitor = Monitor(
+        name="prometheus",
+        storage=storage,
+        formatter=PrometheusFormatter(),
+    )
+
+    health_monitor = Monitor(
+        name="health",
+        storage=storage,
+        formatter=JSONMonitorFormatter(),
+    )
+
+    async def test() -> None:
+        prom_data = await prom_monitor.format_()
+        health_data = await health_monitor.format_()
+        
+        reveal_type(prom_data)
+        reveal_type(health_data)
+  out: |
+    main:21: note: Revealed type is "builtins.str"
+    main:22: note: Revealed type is "builtins.list[builtins.dict[builtins.str, Any]]"
+
+- case: monitor_web_handler_no_annotation
+  main: |
+    from aiomon import Monitor, PrometheusFormatter, MemoryMonitorStorage
+
+    class AppState:
+        def __init__(self) -> None:
+            storage: MemoryMonitorStorage = MemoryMonitorStorage()
+            self.prom_monitor = Monitor(
+                name="prometheus",
+                storage=storage,
+                formatter=PrometheusFormatter(),
+            )
+
+    app = AppState()
+
+    async def metrics_handler() -> str:
+        monitor = app.prom_monitor
+        data = await monitor.format_()
+        reveal_type(data)
+        return data
+  out: |
+    main:17: note: Revealed type is "builtins.str"
+
+- case: monitor_formatter_type_mismatch
+  main: |
+    from aiomon import Monitor, PrometheusFormatter, MemoryMonitorStorage
+
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+    
+    prom_monitor: Monitor[list[int]] = Monitor(
+        name="prometheus",
+        storage=storage,
+        formatter=PrometheusFormatter(),
+    )
+  out: |
+    main:8: error: Argument "formatter" to "Monitor" has incompatible type "PrometheusFormatter"; expected "MonitorFormatter[list[int]]"  [arg-type]
+    main:8: note: Following member(s) of "PrometheusFormatter" have conflicts:
+    main:8: note:     Expected:
+    main:8: note:         def format_(self, metrics: list[MonitorOutputItem[Any]], fields_only: set[str] | None = ...) -> list[int]
+    main:8: note:     Got:
+    main:8: note:         def format_(self, metrics: list[MonitorOutputItem[Any]], fields_only: set[str] | None = ...) -> str

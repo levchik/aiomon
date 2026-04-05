@@ -1,0 +1,39 @@
+- case: formatter_return_types
+  main: |
+    from aiomon import (
+        PrometheusFormatter, JSONMonitorFormatter,
+        MonitorOutputData,
+    )
+
+    prom_formatter = PrometheusFormatter()
+    json_formatter = JSONMonitorFormatter()
+
+    def test() -> None:
+        prom_result = prom_formatter.format_([])
+        json_result = json_formatter.format_([])
+        
+        reveal_type(prom_result)
+        reveal_type(json_result)
+  out: |
+    main:13: note: Revealed type is "builtins.str"
+    main:14: note: Revealed type is "builtins.list[builtins.dict[builtins.str, Any]]"
+
+- case: custom_formatter_custom_return_type
+  main: |
+    from typing import Any
+    from aiomon.base import MonitorFormatter, MonitorOutputData
+
+    class CustomFormatter(MonitorFormatter[dict[str, int]]):
+        def format_(
+            self,
+            metrics: MonitorOutputData,
+            fields_only: set[str] | None = None,
+        ) -> dict[str, int]:
+            return {}
+
+    async def test() -> None:
+        formatter = CustomFormatter()
+        result = formatter.format_([])
+        reveal_type(result)
+  out: |
+    main:15: note: Revealed type is "builtins.dict[builtins.str, builtins.int]"

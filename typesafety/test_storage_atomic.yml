@@ -1,0 +1,28 @@
+- case: storage_modify_type_safe
+  main: |
+    from aiomon import MemoryMonitorStorage
+
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+
+    async def test() -> None:
+        result = await storage.modify(
+            name="counter",
+            modifier=lambda v: (v or 0) + 1,
+        )
+        reveal_type(result)
+  out: |
+    main:10: note: Revealed type is "Any"
+
+- case: storage_protocol_conformance
+  main: |
+    from aiomon.base import MonitorStorage
+
+    def accepts_storage(storage: MonitorStorage) -> None:
+        pass
+
+    from aiomon import MemoryMonitorStorage
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+    
+    accepts_storage(storage)
+  out: |
+    Success: no issues found in 1 source file

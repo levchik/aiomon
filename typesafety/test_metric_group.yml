@@ -1,0 +1,33 @@
+- case: metric_group_type_safe_access
+  main: |
+    from aiomon import MetricGroup, CounterMetric, GaugeMetric, MemoryMonitorStorage
+
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+
+    class AppMetrics(MetricGroup, storage=storage):
+        requests_total = CounterMetric("requests_total", storage=storage)
+        temperature = GaugeMetric("temperature", storage=storage)
+
+    async def test() -> None:
+        reveal_type(AppMetrics.requests_total)
+        reveal_type(AppMetrics.temperature)
+        
+        await AppMetrics.requests_total.inc()
+        await AppMetrics.temperature.set(25.0)
+  out: |
+    main:10: note: Revealed type is "aiomon.impl.metrics.counter.CounterMetric"
+    main:11: note: Revealed type is "aiomon.impl.metrics.gauge.GaugeMetric"
+
+- case: metric_group_wrong_method
+  main: |
+    from aiomon import MetricGroup, CounterMetric, MemoryMonitorStorage
+
+    storage: MemoryMonitorStorage = MemoryMonitorStorage()
+
+    class AppMetrics(MetricGroup, storage=storage):
+        requests_total = CounterMetric("requests_total", storage=storage)
+
+    async def test() -> None:
+        await AppMetrics.requests_total.set(5)
+  out: |
+    main:9: error: "CounterMetric" has no attribute "set"  [attr-defined]
