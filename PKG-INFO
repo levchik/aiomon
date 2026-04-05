@@ -1,0 +1,50 @@
+Metadata-Version: 2.1
+Name: aiomon
+Version: 0.0.1
+Summary: Simple asyncio-based monitor for healthchecks and metrics
+Project-URL: Documentation, https://github.com/levchik/aiomon#readme
+Project-URL: Issues, https://github.com/levchik/aiomon/issues
+Project-URL: Source, https://github.com/levchik/aiomon
+Author-email: Lev Rubel <rubel.lev@gmail.com>
+License-Expression: MIT
+License-File: LICENSE.txt
+Keywords: asyncio,healthcheck,metrics,monitor,monitoring
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.11
+Requires-Dist: aiorwlock<2.0.0,>=1.3.0
+Requires-Dist: typing-extensions<5.0.0,>=4.7.1; python_version <= '3.7'
+Description-Content-Type: text/markdown
+
+# aiomon
+
+[![PyPI - Version](https://img.shields.io/pypi/v/aiomon.svg)](https://pypi.org/project/aiomon)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aiomon.svg)](https://pypi.org/project/aiomon)
+
+-----
+
+**Table of Contents**
+
+- [Installation](#installation)
+- [License](#license)
+
+## Installation
+
+```console
+pip install aiomon
+```
+
+## Development
+
+Run tests with coverage:
+
+```console
+hatch run cov
+```
+
+## License
+
+`aiomon` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
